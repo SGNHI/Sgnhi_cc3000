@@ -51,11 +51,12 @@ public:
 	//int request(void *val,int type);
 	//
 	//vvoid setvalue(void *val);
-private:
 	int argType;
 	int chk = 42;
 	char* senCode;
 	uint32_t value;
+private:
+	
 };
 
 
