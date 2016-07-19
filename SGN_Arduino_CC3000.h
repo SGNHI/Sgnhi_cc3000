@@ -48,24 +48,21 @@ public:
 	void set(float val);
 	void set(long val);
 	void set(double val);
-	//int request(void *val,int type);
-	//
-	//vvoid setvalue(void *val);
+private:
 	int argType;
 	int chk = 42;
 	char* senCode;
 	uint32_t value;
-private:
-	
+friend class Sgnhi_CC3000;
 };
 
 
 
-class Sgnhi_CC3000 : public Adafruit_CC3000{
+class Sgnhi_CC3000 : public Adafruit_CC3000{//아다후르츠 cc3000객체 상속
 public:
 	Sgnhi_CC3000(const char *id,const char *devcode,uint8_t csPin, uint8_t irqPin, uint8_t vbatPin, uint8_t spispeed = SPI_CLOCK_DIVIDER, Print* cc3kPrinter = CC3K_DEFAULT_PRINTER)
 	: Adafruit_CC3000(csPin,irqPin,vbatPin,spispeed,cc3kPrinter),ID(id),devCode(devcode){};
-	
+
 	int send(dotori mdotori,...);
 	void setRest(unsigned long rest);
 private:
