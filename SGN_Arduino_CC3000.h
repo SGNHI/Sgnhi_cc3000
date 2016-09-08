@@ -64,6 +64,7 @@ public:
 	: Adafruit_CC3000(csPin,irqPin,vbatPin,spispeed,cc3kPrinter),ID(id),devCode(devcode){};
 
 	int send(dotori mdotori,...);
+	int mail(char *subject,char *text);
 	void setRest(unsigned long rest);
 private:
 	const char *ID;
