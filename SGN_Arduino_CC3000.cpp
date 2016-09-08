@@ -41,6 +41,46 @@ void Sgnhi_CC3000::setRest(unsigned long rest){
 	restTime = rest < REST? REST:rest;
 }
 
+int Sgnhi_CC3000::mail(char *subject,char *text){
+	int now_status = (int)getStatus();
+	//Serial.println(now_status);//테스트
+	if(now_status != 3){//확인후 적절히 동작을 취하도록 함.
+		return now_status;//일단 연결 상태가 아니면 ㅂㅂ 하도록 함.
+	}
+	Adafruit_CC3000_Client client = connectTCP(0xB76FAE45,80);//클라이언트 객체 새로 만들필요 없이 여기서 바로 끝장...!
+	String sgnhi_packet;//스근하이 패킷 생성.
+	sgnhi_packet = "GET /iot/iot_up.php?";
+	sgnhi_packet += "uid=" + String(ID);
+	sgnhi_packet += "&dc=" + String(devCode);
+	sgnhi_packet += "&ms=" + String(subject);
+	sgnhi_packet += "&mt=" + String(text);
+	sgnhi_packet += " HTTP/1.1\r\n";
+	sgnhi_packet += "Host:sgnhi.org \r\n";
+	sgnhi_packet += "User-Agent: sgnhi\r\n";
+	sgnhi_packet += "Connection: close\r\n\r\n";
+	if (client.connected()) {
+		DEBUG_PRINT("connected");
+		int packetLength = sgnhi_packet.length();
+		for(int i = 0;i < packetLength;i++){
+			client.write(sgnhi_packet.charAt(i));
+			//Serial.write(sgnhi_packet.charAt(i));
+			//새로운 char문자열을 만드는것보다는 메모리를 적게 쓰리라 믿음.
+		}
+		client.stop();
+		return sgnhi_OK;
+	}
+	else {
+		//Serial.println(client.status());
+		client.stop();
+		while(!checkDHCP()){
+			delay(100);
+		}
+  		DEBUG_PRINT("connection failed");
+  		DEBUG_PRINT("try to begin");
+  		//init();
+  		return sgnhi_ERROR;
+  	}
+}
 
 int Sgnhi_CC3000::send(dotori mdotori, ...){//iot_up 소스코드 수정해야함 -> 수정완료.
 	//return 1;
@@ -66,7 +106,6 @@ int Sgnhi_CC3000::send(dotori mdotori, ...){//iot_up 소스코드 수정해야�
 		return now_status;//일단 연결 상태가 아니면 ㅂㅂ 하도록 함.
 	}
 	Adafruit_CC3000_Client client = connectTCP(0xB76FAE45,80);//클라이언트 객체 새로 만들필요 없이 여기서 바로 끝장...!
-	//후.. 아다후루츠 cc3000의 fastprint는 char *만 출력가능. 아래 의 패킷 전체를 String 으로 변형 후, 다시 char array로 변형하도록 하거나 아님... sprintf 로문자열로 변경..
 	String sgnhi_packet;//스근하이 패킷 생성.
 	sgnhi_packet = "GET /iot/iot_up.php?";
 	sgnhi_packet += "uid=" + String(ID);
